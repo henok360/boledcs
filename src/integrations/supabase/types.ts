@@ -14,16 +14,175 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      coupon_tokens: {
+        Row: {
+          amount: number
+          created_at: string
+          expires_at: string
+          id: string
+          redeemed_at: string | null
+          redeemed_by: string | null
+          status: string
+          token: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          expires_at: string
+          id?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          status?: string
+          token: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          expires_at?: string
+          id?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          status?: string
+          token?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          must_reset_password: boolean
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          must_reset_password?: boolean
+          username: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          must_reset_password?: boolean
+          username?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          cashier_id: string | null
+          created_at: string
+          employee_id: string
+          id: string
+          token_id: string | null
+          week_start: string
+        }
+        Insert: {
+          amount: number
+          cashier_id?: string | null
+          created_at?: string
+          employee_id: string
+          id?: string
+          token_id?: string | null
+          week_start: string
+        }
+        Update: {
+          amount?: number
+          cashier_id?: string | null
+          created_at?: string
+          employee_id?: string
+          id?: string
+          token_id?: string | null
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "coupon_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_allocations: {
+        Row: {
+          approved_amount: number
+          approved_by: string | null
+          created_at: string
+          id: string
+          remaining_amount: number
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          approved_amount?: number
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          remaining_amount?: number
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          approved_amount?: number
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          remaining_amount?: number
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      dcs_week_start: { Args: { _ts?: string }; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      redeem_coupon: {
+        Args: { _cashier: string; _token: string }
+        Returns: Json
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "super_admin" | "cashier" | "auditor" | "employee"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +309,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["super_admin", "cashier", "auditor", "employee"],
+    },
   },
 } as const
